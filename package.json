@@ -1,19 +1,16 @@
 {
   "name": "mzek-poirot",
-  "version": "1.0.0",
-  "description": "",
+  "version": "0.0.1",
+  "description": "file integrity checking tool",
   "main": "index.js",
   "bin": {
     "poirot": "bin.js"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/mzek/mzek-poirot.git"
   },
-  "author": "mzek",
+  "author": "m-onz",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/mzek/mzek-poirot/issues"

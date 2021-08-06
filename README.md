@@ -1,6 +1,6 @@
 # mzek-poirot
 
-A simple ile integrity checking tool.
+A file integrity monitoring tool (like aide or tripwire).
 
 ## progress
 
