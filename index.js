@@ -33,15 +33,16 @@ Poirot.prototype.update = function (cb) {
   console.log('using... ', self.files)
   pull(
       read(self.files),
-      pull.through(function (i) {
-	if (!i) return i
+      paramap(function (i, cb) {
+	if (!i) return cb(void 0, i)
         i.digest = sha256sum(Buffer.from(i.data))
         if (i.base) i.full_path = `${i.base}/${i.path}`
           else i.full_path = i.path
         delete i.data
         delete i.path
         delete i.base
-        return i
+        console.log('added ', i.full_path)
+        cb(void 0, i)
       }),
       pull.collect(function (err, file) {
         if (!err) {

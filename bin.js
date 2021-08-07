@@ -8,14 +8,19 @@ var mkdirp = require('mkdirp')
 var Poirot = require('.')
 var os = require('os')
 var fs = require('fs')
+var recursive = require("recursive-readdir")
 
 var instructions = `
+
   mzek-poirot
     usage:
       poirot --update --files ./files.json
       poirot --update :: generates the file hashes db
       poirot --check  :: checks the file db for changes
-      poirot --watch
+      poirot --watch :: watch for changes
+      poirot --readdir :: print folder contents recursively
+      poirot --readdir --save :: save the file to disk
+
 `
 
 if (Object.keys(argv).length < 2) return console.log(instructions)
@@ -49,4 +54,15 @@ files.forEach(function (path) {
   poirot.watch(function () {
     poirot.ev.on('change', console.log)
   })
+} else if (argv.readdir) {
+  recursive(process.cwd()).then(function (data) {
+    var path = process.cwd()+'/mzek-'+Date.now()+'-files.list.json'
+    if (argv.save) fs.writeFileSync(path, JSON.stringify(data, void 0, 2))
+      else console.log('> ', data)
+  }).catch(console.log)
+
+/*, function (err, files) {
+    if (!err) console.log(files)
+      else console.log(err)
+  })*/
 }

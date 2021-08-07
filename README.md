@@ -12,6 +12,7 @@ npm i mzek-poirot -g
 poirot --update --files ./files.json
 poirot --check
 poirot --watch
+poirot --readdir --save
 
 ```
 
@@ -100,3 +101,19 @@ watch continuously
 poirot --watch
 
 ```
+
+generate a files json file...
+
+```sh
+
+poirot --readdir --save
+
+```
+
+Will generate file like: `mzek-1628360392269-files.list.json`
+
+## licence
+
+MIT
+
+
