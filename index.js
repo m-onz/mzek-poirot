@@ -4,7 +4,9 @@ var fs = require('fs')
 var pull = require('pull-stream')
 var { read, write } = require('pull-files')
 var { createHash } = require('crypto')
+var watch = require('pull-watch')
 var mkdirp = require('mkdirp')
+var EventEmitter = require('events').EventEmitter
 
 function sha256sum (input) {
   var hash = createHash('sha256')
@@ -20,6 +22,7 @@ function Poirot (files) {
   this.db_path = `${this.poirot_dir}/files.db.json`
   console.log(this.db_path)
   mkdirp.sync(this.poirot_dir)
+  this.ev = new EventEmitter
 }
 
 Poirot.prototype.sha256sum = sha256sum
@@ -75,6 +78,37 @@ Poirot.prototype.check = function (cb) {
   )
 }
 
-Poirot.prototype.watch  = function () {}
+Poirot.prototype.watch  = function (cb) {
+  if (typeof cb !== 'function') throw Error('needs a callback')
+  var self = this
+  var files = JSON.parse(fs.readFileSync(self.db_path).toString())
+  console.log(files.map(function (i) { return i.full_path }))
+  self.watcher = watch(files.map(function (i) { return i.full_path }))
+  pull(
+    self.watcher.listen(),
+    pull.drain(function (event) {
+      files.forEach(function (file) {
+        if (file.full_path === event.path) {
+          var contents = fs.readFileSync(event.path).toString()
+          var hash = sha256sum(contents)
+          if (hash !== file.digest) self.ev.emit('change', {
+            path: event.path,
+            contents: contents.split('\n').filter(function (i) { return i.length; })
+          })
+        }
+      })
+    }, function (err) {
+      console.log('error ', err)
+      self.watcher.end()
+    })
+  )
+  cb(null, true)
+}
+
+Poirot.prototype.unwatch = function (cb) {
+  var self = this
+  if (typeof self.watcher === 'object') self.watcher.end()
+  if (typeof cb === 'function') cb(null, true)
+}
 
 module.exports = Poirot;

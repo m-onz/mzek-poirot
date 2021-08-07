@@ -60,4 +60,9 @@ if (argv.update) {
       if (!err) console.log(result.length, ' files changed ', result)
         else throw err
     })
+} else if (argv.watch) {
+    var poirot = Poirot([])
+    poirot.watch(function () {
+      poirot.ev.on('change', console.log)
+    })
 }

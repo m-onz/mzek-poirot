@@ -24,7 +24,14 @@ Poirot.update(console.log)
 
 fs.appendFileSync('./helloWorld.txt', 'test\n')
 
-Poirot.check(console.log)
+Poirot.check(function () {
+  Poirot.watch(function () {
+    Poirot.ev.on('change', function (message) {
+      console.log(message)
+      Poirot.unwatch()
+    })
+  })
+})
 
 ```
 
@@ -49,5 +56,13 @@ Check if any of the files have been changed
 ```sh
 
 poirot --check
+
+```
+
+watch continuously
+
+```sh
+
+poirot --watch
 
 ```

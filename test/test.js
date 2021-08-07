@@ -51,3 +51,20 @@ test('can check the files integrity', function (t) {
     })
   })
 })
+
+test('can monitor files', function (t) {
+  t.plan(2)
+  var p = Poirot(mock)
+  p.update(function (err) {
+    t.ok(!err)
+    p.watch(function () {
+      p.ev.on('change', function () {
+        console.log('change detected '); t.ok(true);
+        process.nextTick(function () { p.unwatch() })
+      })
+      setTimeout(function () {
+        fs.appendFileSync(__dirname+'/data/test_1.txt', 'test\n')
+      }, 11)
+    })
+  })
+})
