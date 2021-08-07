@@ -19,53 +19,34 @@ var instructions = `
 `
 
 if (Object.keys(argv).length < 2) return console.log(instructions)
-/*
-[
-//os.homedir()+'/.bash_logout',
-//os.homedir()+'/.bash_profile',
-//os.homedir()+'/.bashrc',
-'/etc/aliases',
-'/etc/hosts.deny',
-'/etc/hosts.allow',
-'/etc/inittab',
-'/etc/issue',
-'/etc/mtab',
-'/etc/passwd',
-'/etc/group',
-'/etc/fstab',
-'/etc/hosts',
-'/etc/modules.conf',
-'/etc/resolv.conf',
-]
-*/
-var files = []
 
+var files = []
 if (argv.files) files = JSON.parse(fs.readFileSync(argv.files).toString())
 
 if (argv.update) {
-    var files_found = []
-    var files_missing = []
-    files.forEach(function (path) {
-      try {
-         var x = fs.statSync(path)
-         if (typeof x === 'object') files_found.push(path)
-      } catch (e) { files_missing.push(path) }
-    })
-    var poirot = Poirot(files_found)
-    console.log('found ', files_found)
-    console.log('missing ', files_missing)
-    poirot.update(function () {
-      console.log('created db at ', poirot.db_path)
-    })
+var files_found = []
+var files_missing = []
+files.forEach(function (path) {
+  try {
+    var x = fs.statSync(path)
+    if (typeof x === 'object') files_found.push(path)
+    } catch (e) { files_missing.push(path) }
+  })
+  var poirot = Poirot(files_found)
+  console.log('found ', files_found)
+  console.log('missing ', files_missing)
+  poirot.update(function () {
+    console.log('created db at ', poirot.db_path)
+  })
 } else if (argv.check) {
-    var poirot = Poirot([])
-    poirot.check(function (err, result) {
-      if (!err) console.log(result.length, ' files changed ', result)
-        else throw err
-    })
+  var poirot = Poirot([])
+  poirot.check(function (err, result) {
+    if (!err) console.log(result.length, ' files changed ', result)
+      else throw err
+  })
 } else if (argv.watch) {
-    var poirot = Poirot([])
-    poirot.watch(function () {
-      poirot.ev.on('change', console.log)
-    })
+  var poirot = Poirot([])
+  poirot.watch(function () {
+    poirot.ev.on('change', console.log)
+  })
 }
