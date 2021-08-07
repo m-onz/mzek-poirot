@@ -54,12 +54,10 @@ if (argv.update) {
     poirot.update(function () {
       console.log('created db at ', poirot.db_path)
     })
-    delete poirot
 } else if (argv.check) {
     var poirot = Poirot([])
     poirot.check(function (err, result) {
       if (!err) console.log(result.length, ' files changed ', result)
         else throw err
     })
-    delete poirot
 }
