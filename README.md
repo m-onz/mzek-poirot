@@ -4,8 +4,31 @@ A file integrity monitoring tool (like aide or tripwire).
 
 ## install
 
+A global command line tool
+
 ```sh
 npm i mzek-poirot -g
+```
+
+of as a libray
+
+```sh
+npm i mzek-poirot --save
+```
+
+```js
+
+var Poirot = require('mzek-poirot')([ 'helloWorld.txt' ])
+
+Poirot.update()
+console.log(Poirot.check())
+
+```
+
+## run the tests
+
+```sh
+npm run test
 ```
 
 ## usage

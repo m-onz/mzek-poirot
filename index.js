@@ -29,7 +29,7 @@ Poirot.prototype.update = function (cb) {
       pull.through(function (i) {
 	if (!i) return i
         i.digest = sha256sum(Buffer.from(i.data))
-        if (i.base) i.full_path = i.base+'/'+i.path
+        if (i.base) i.full_path = `${i.base}/${i.path}`
           else i.full_path = i.path
         delete i.data
         delete i.path
@@ -39,7 +39,7 @@ Poirot.prototype.update = function (cb) {
       pull.collect(function (err, file) {
         if (!err) {
           fs.writeFileSync(
-            self.poirot_dir+'/files.db.json',
+            `${self.poirot_dir}/files.db.json`,
             JSON.stringify(file, void 0, 2)
           )
           if (typeof cb === 'function') cb(void 0, true)

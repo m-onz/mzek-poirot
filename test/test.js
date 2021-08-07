@@ -40,8 +40,8 @@ test('can update the files integrity db', function (t) {
 })
 
 test('can check the files integrity', function (t) {
-
-
+  t.plan(1)
+  t.ok(false)
 })
 
 /*
