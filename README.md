@@ -19,18 +19,18 @@ where an example `files.json` looks like this...
 
 ```json
 [
-  '/etc/aliases',
-  '/etc/hosts.deny',
-  '/etc/hosts.allow',
-  '/etc/inittab',
-  '/etc/issue',
-  '/etc/mtab',
-  '/etc/passwd',
-  '/etc/group',
-  '/etc/fstab',
-  '/etc/hosts',
-  '/etc/modules.conf',
-  '/etc/resolv.conf'
+  "/etc/aliases",
+  "/etc/hosts.deny",
+  "/etc/hosts.allow",
+  "/etc/inittab",
+  "/etc/issue",
+  "/etc/mtab",
+  "/etc/passwd",
+  "/etc/group",
+  "/etc/fstab",
+  "/etc/hosts",
+  "/etc/modules.conf",
+  "/etc/resolv.conf"
 ]
 ```
 
