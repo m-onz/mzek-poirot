@@ -23,7 +23,6 @@ function Poirot (files) {
   this.db_path = `${this.poirot_dir}/files.db.json`
   console.log(this.db_path)
   mkdirp.sync(this.poirot_dir)
-  //this.ev = new EventEmitter
 }
 
 util.inherits(Poirot, EventEmitter)
@@ -97,11 +96,7 @@ Poirot.prototype.watch  = function (cb) {
           var hash = sha256sum(contents)
           if (hash !== file.digest) self.emit('change', {
             path: event.path,
-            contents: contents
-                        .split('\n')
-                        .filter(function (i) {
-                          return i.length;
-                         })
+            contents: contents.split('\n').filter(function (i) { return i.length; })
           })
         }
       })
