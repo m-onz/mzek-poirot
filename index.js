@@ -1,6 +1,7 @@
 var EventEmitter = require('events').EventEmitter
 var { read, write } = require('pull-files')
 var { createHash } = require('crypto')
+var paramap = require('pull-paramap')
 var watch = require('pull-watch')
 var pull = require('pull-stream')
 var mkdirp = require('mkdirp')
@@ -61,14 +62,14 @@ Poirot.prototype.check = function (cb) {
   var files = JSON.parse(fs.readFileSync(self.db_path).toString())
   pull(
     pull.values(files),
-    pull.through(function (i) {
+    paramap(function (i, cb) {
       try {
         var file = fs.readFileSync(i.full_path)
         var hash = sha256sum(file)
         if (i.digest === hash) i.matches = true
           else i.matches = false
         } catch (e) {}
-      return i
+      cb(void 0, i)
     }),
     pull.collect(function (err, file) {
       if (!err) cb (null, file.filter(function (i) { return !i.matches }))
