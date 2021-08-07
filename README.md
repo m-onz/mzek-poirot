@@ -61,7 +61,7 @@ fs.appendFileSync('./helloWorld.txt', 'test\n')
 
 Poirot.check(function () {
   Poirot.watch(function () {
-    Poirot.ev.on('change', function (message) {
+    Poirot.on('change', function (message) {
       console.log(message)
       Poirot.unwatch()
     })

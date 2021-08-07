@@ -58,7 +58,7 @@ test('can monitor files', function (t) {
   p.update(function (err) {
     t.ok(!err)
     p.watch(function () {
-      p.ev.on('change', function () {
+      p.on('change', function () {
         console.log('change detected '); t.ok(true);
         process.nextTick(function () { p.unwatch() })
       })

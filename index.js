@@ -5,6 +5,7 @@ var paramap = require('pull-paramap')
 var watch = require('pull-watch')
 var pull = require('pull-stream')
 var mkdirp = require('mkdirp')
+var util = require('util')
 var os = require('os')
 var fs = require('fs')
 
@@ -22,8 +23,10 @@ function Poirot (files) {
   this.db_path = `${this.poirot_dir}/files.db.json`
   console.log(this.db_path)
   mkdirp.sync(this.poirot_dir)
-  this.ev = new EventEmitter
+  //this.ev = new EventEmitter
 }
+
+util.inherits(Poirot, EventEmitter)
 
 Poirot.prototype.sha256sum = sha256sum
 
@@ -92,7 +95,7 @@ Poirot.prototype.watch  = function (cb) {
         if (file.full_path === event.path) {
           var contents = fs.readFileSync(event.path).toString()
           var hash = sha256sum(contents)
-          if (hash !== file.digest) self.ev.emit('change', {
+          if (hash !== file.digest) self.emit('change', {
             path: event.path,
             contents: contents
                         .split('\n')
