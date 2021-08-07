@@ -34,6 +34,16 @@ where an example `files.json` looks like this...
 ]
 ```
 
+## the file hash database
+
+Poirot creates a folder in your home directory
+
+```
+~/.poirot
+```
+
+The file database is stored there as `files.db.json`
+
 ## usage as a library
 
 ```sh
