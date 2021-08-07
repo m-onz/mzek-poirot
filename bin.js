@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 var argv = require('minimist')(process.argv.slice(2));
+var recursive = require('recursive-readdir')
 var { read, write } = require('pull-files')
 var { createHash } = require('crypto')
 var pull = require('pull-stream')
@@ -8,7 +9,6 @@ var mkdirp = require('mkdirp')
 var Poirot = require('.')
 var os = require('os')
 var fs = require('fs')
-var recursive = require("recursive-readdir")
 
 var instructions = `
 
@@ -56,13 +56,8 @@ files.forEach(function (path) {
   })
 } else if (argv.readdir) {
   recursive(process.cwd()).then(function (data) {
-    var path = process.cwd()+'/mzek-'+Date.now()+'-files.list.json'
+    var path = process.cwd()+'/mzek-'+Date.now()+'-files.poirot.json'
     if (argv.save) fs.writeFileSync(path, JSON.stringify(data, void 0, 2))
       else console.log('> ', data)
   }).catch(console.log)
-
-/*, function (err, files) {
-    if (!err) console.log(files)
-      else console.log(err)
-  })*/
 }
