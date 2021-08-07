@@ -1,45 +1,48 @@
 #!/usr/bin/env node
 
 var argv = require('minimist')(process.argv.slice(2));
-var os = require('os')
-var fs = require('fs')
-var pull = require('pull-stream')
 var { read, write } = require('pull-files')
 var { createHash } = require('crypto')
+var pull = require('pull-stream')
 var mkdirp = require('mkdirp')
 var Poirot = require('.')
+var os = require('os')
+var fs = require('fs')
 
 var instructions = `
-
   mzek-poirot
-
     usage:
-
-      poirot --update :: generates the file hashes saving to ~/.poirot/files.db.json
+      poirot --update --files ./files.json
+      poirot --update :: generates the file hashes db
       poirot --check  :: checks the file db for changes
-
+      poirot --watch
 `
 
 if (Object.keys(argv).length < 2) return console.log(instructions)
+/*
+[
+//os.homedir()+'/.bash_logout',
+//os.homedir()+'/.bash_profile',
+//os.homedir()+'/.bashrc',
+'/etc/aliases',
+'/etc/hosts.deny',
+'/etc/hosts.allow',
+'/etc/inittab',
+'/etc/issue',
+'/etc/mtab',
+'/etc/passwd',
+'/etc/group',
+'/etc/fstab',
+'/etc/hosts',
+'/etc/modules.conf',
+'/etc/resolv.conf',
+]
+*/
+var files = []
+
+if (argv.files) files = JSON.parse(fs.readFileSync(argv.files).toString())
 
 if (argv.update) {
-    var files = [
-      os.homedir()+'/.bash_logout',
-      os.homedir()+'/.bash_profile',
-      os.homedir()+'/.bashrc',
-      '/etc/aliases',
-      '/etc/hosts.deny',
-      '/etc/hosts.allow',
-      '/etc/inittab',
-      '/etc/issue',
-      '/etc/mtab',
-      '/etc/passwd',
-      '/etc/group',
-      '/etc/fstab',
-      '/etc/hosts',
-      '/etc/modules.conf',
-      '/etc/resolv.conf',
-    ]
     var files_found = []
     var files_missing = []
     files.forEach(function (path) {

@@ -1,4 +1,3 @@
-
 var os = require('os')
 var fs = require('fs')
 var pull = require('pull-stream')
@@ -93,12 +92,15 @@ Poirot.prototype.watch  = function (cb) {
           var hash = sha256sum(contents)
           if (hash !== file.digest) self.ev.emit('change', {
             path: event.path,
-            contents: contents.split('\n').filter(function (i) { return i.length; })
+            contents: contents
+                        .split('\n')
+                        .filter(function (i) {
+                          return i.length;
+                         })
           })
         }
       })
     }, function (err) {
-      console.log('error ', err)
       self.watcher.end()
     })
   )

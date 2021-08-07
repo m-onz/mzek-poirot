@@ -8,6 +8,11 @@ A global command line tool
 
 ```sh
 npm i mzek-poirot -g
+
+poirot --update --files ./files.json
+poirot --check
+poirot --watch
+
 ```
 
 of as a library
