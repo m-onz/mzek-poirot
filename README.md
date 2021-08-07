@@ -10,7 +10,7 @@ A global command line tool
 npm i mzek-poirot -g
 ```
 
-of as a libray
+of as a library
 
 ```sh
 npm i mzek-poirot --save
