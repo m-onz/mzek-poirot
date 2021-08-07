@@ -5,10 +5,11 @@ var Poirot = require('..')
 
 var mock = [
   `${__dirname}/data/test_1.txt`,
-  `${__dirname}/data/test_2.txt`,
-  `${__dirname}/data/test_3.txt`,
-  `${__dirname}/data/test_4.txt`,
 ]
+
+try {
+  fs.writeFileSync(os.homedir()+'/.poirot/files.db.json', '[]')
+} catch(e){}
 
 test('can create Poirot', function (t) {
   t.plan(1)
