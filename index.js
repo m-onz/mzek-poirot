@@ -1,11 +1,11 @@
-var os = require('os')
-var fs = require('fs')
-var pull = require('pull-stream')
+var EventEmitter = require('events').EventEmitter
 var { read, write } = require('pull-files')
 var { createHash } = require('crypto')
 var watch = require('pull-watch')
+var pull = require('pull-stream')
 var mkdirp = require('mkdirp')
-var EventEmitter = require('events').EventEmitter
+var os = require('os')
+var fs = require('fs')
 
 function sha256sum (input) {
   var hash = createHash('sha256')
