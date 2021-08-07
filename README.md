@@ -1,6 +1,6 @@
 # mzek-poirot
 
-A file integrity monitoring tool (like aide or tripwire).
+A simple file integrity monitoring tool (like aide or tripwire).
 
 ## install
 
@@ -20,8 +20,11 @@ npm i mzek-poirot --save
 
 var Poirot = require('mzek-poirot')([ 'helloWorld.txt' ])
 
-Poirot.update()
-console.log(Poirot.check())
+Poirot.update(console.log)
+
+fs.appendFileSync('./helloWorld.txt', 'test\n')
+
+Poirot.check(console.log)
 
 ```
 

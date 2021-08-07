@@ -26,7 +26,8 @@ Poirot.prototype.sha256sum = sha256sum
 
 Poirot.prototype.update = function (cb) {
   var self = this
-  console.log(self.files)
+  if (typeof cb !== 'function') throw Error('needs a callback')
+  console.log('using... ', self.files)
   pull(
       read(self.files),
       pull.through(function (i) {
