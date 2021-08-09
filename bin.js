@@ -27,7 +27,9 @@ var instructions = `
 if (Object.keys(argv).length < 2) return console.log(instructions)
 // check
 if (argv.check) {
+if (typeof argv.check !== 'string') argv.check = `${process.cwd()}/db.csv`
 var files = path.normalize(argv.check)
+console.log('checking ', files)
 pull(
   toPull.source(fs.createReadStream(files)),
   pull.map(function (i, cb) {
@@ -52,6 +54,8 @@ pull(
 var files = path.normalize(argv.update)
 var output = path.normalize(process.cwd()+'/db.csv')
 if (argv.output) output = path.normalize(argv.output)
+console.log('checking ', files)
+console.log('saving to ', output)
 pull(
   toPull.source(fs.createReadStream(files)),
   pull.map(function (i, cb) {
