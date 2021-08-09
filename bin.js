@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 
 var argv = require('minimist')(process.argv.slice(2));
-var path = require('path')
-var fs = require('fs')
-var pull = require('pull-stream')
-var crypto = require('crypto')
 var toPull = require('stream-to-pull-stream')
 var paramap = require('pull-paramap')
+var pull = require('pull-stream')
+var crypto = require('crypto')
+var path = require('path')
+var fs = require('fs')
 
 function sha256sum (input) {
   var hash = crypto.createHash('sha256')
@@ -49,7 +49,7 @@ pull(
   pull.drain(function (i) { console.log(i.path); })
 )} else if (argv.update) {
 var files = path.normalize(argv.update)
-var output = process.cwd()+'/output.csv'
+var output = path.normalize(process.cwd()+'/db.csv')
 if (argv.output) output = path.normalize(argv.output)
 pull(
   toPull.source(fs.createReadStream(files)),
@@ -74,4 +74,5 @@ pull(
   }),
   pull.drain(console.log)
 )}
+
 // ...
