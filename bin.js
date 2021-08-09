@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-var argv = require('minimist')(process.argv.slice(2));
+var argv = require('minimist')(process.argv.slice(2))
 var toPull = require('stream-to-pull-stream')
 var paramap = require('pull-paramap')
 var pull = require('pull-stream')
