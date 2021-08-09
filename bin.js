@@ -1,63 +1,77 @@
 #!/usr/bin/env node
 
 var argv = require('minimist')(process.argv.slice(2));
-var recursive = require('recursive-readdir')
-var { read, write } = require('pull-files')
-var { createHash } = require('crypto')
-var pull = require('pull-stream')
-var mkdirp = require('mkdirp')
-var Poirot = require('.')
-var os = require('os')
+var path = require('path')
 var fs = require('fs')
+var pull = require('pull-stream')
+var crypto = require('crypto')
+var toPull = require('stream-to-pull-stream')
+var paramap = require('pull-paramap')
+
+function sha256sum (input) {
+  var hash = crypto.createHash('sha256')
+  hash.update(input)
+  return hash.digest('hex')
+}
 
 var instructions = `
 
   mzek-poirot
-    usage:
-      poirot --update --files ./files.json
-      poirot --update :: generates the file hashes db
-      poirot --check  :: checks the file db for changes
-      poirot --watch :: watch for changes
-      poirot --readdir :: print folder contents recursively
-      poirot --readdir --save :: save the file to disk
+
+    poirot --update ./files.csv --output ./db.csv
+    poirot --check ./db.csv
 
 `
 
 if (Object.keys(argv).length < 2) return console.log(instructions)
-
-var files = []
-if (argv.files) files = JSON.parse(fs.readFileSync(argv.files).toString())
-
-if (argv.update) {
-var files_found = []
-var files_missing = []
-files.forEach(function (path) {
-  try {
-    var x = fs.statSync(path)
-    if (typeof x === 'object') files_found.push(path)
-    } catch (e) { files_missing.push(path) }
-  })
-  var poirot = Poirot(files_found)
-  console.log('found ', files_found)
-  console.log('missing ', files_missing)
-  poirot.update(function () {
-    console.log('created db at ', poirot.db_path)
-  })
-} else if (argv.check) {
-  var poirot = Poirot([])
-  poirot.check(function (err, result) {
-    if (!err) console.log(result.length, ' files changed ', result)
-      else throw err
-  })
-} else if (argv.watch) {
-  var poirot = Poirot([])
-  poirot.watch(function () {
-    poirot.ev.on('change', console.log)
-  })
-} else if (argv.readdir) {
-  recursive(process.cwd()).then(function (data) {
-    var path = process.cwd()+'/mzek-'+Date.now()+'-files.poirot.json'
-    if (argv.save) fs.writeFileSync(path, JSON.stringify(data, void 0, 2))
-      else console.log('> ', data)
-  }).catch(console.log)
-}
+// check
+if (argv.check) {
+var files = path.normalize(argv.check)
+pull(
+  toPull.source(fs.createReadStream(files)),
+  pull.map(function (i, cb) {
+    return i.toString().split('\n')
+  }),
+  pull.flatten(),
+  paramap(function (i, cb) {
+    var segment = i.split(',')
+    var file = segment[0]
+    var digest = segment[1]
+    if (!digest || !file || digest.length !== 64) return cb(null, { skipped: true })
+    fs.readFile(file, function (err, data) {
+      if (data) cb(null, { path: file, matches: sha256sum(data) === digest, digest: digest })
+        else cb(null, { skipped: true })
+    })
+  }),
+  pull.filter(function (i) {
+    return !i.matches && !i.skipped
+  }),
+  pull.drain(function (i) { console.log(i.path); })
+)} else if (argv.update) {
+var files = path.normalize(argv.update)
+var output = process.cwd()+'/output.csv'
+if (argv.output) output = path.normalize(argv.output)
+pull(
+  toPull.source(fs.createReadStream(files)),
+  pull.map(function (i, cb) {
+    return i.toString().split('\n')
+  }),
+  pull.flatten(),
+  paramap(function (i, cb) {
+    if (typeof i !== 'string') return cb(null, 'must be a string')
+    if (i && i.startsWith('/proc')) return cb(null, 'skipping /proc')
+    if (i && i.startsWith('/boot')) return cb(null, 'skipping /boot')
+    if (i && i.startsWith('/sys')) return cb(null, 'skipping /sys')
+    fs.readFile(i, function (err, data) {
+      if (err) { return console.log(err); cb(null, err) }
+      var line = `${i},${sha256sum(data)}\n`
+      fs.appendFile(output, line, function (err) {
+        if (err) return cb(null. err)
+        cb(null, line)
+      })
+    })
+    cb(null, i)
+  }),
+  pull.drain(console.log)
+)}
+// ...

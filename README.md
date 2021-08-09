@@ -1,116 +1,34 @@
 # mzek-poirot
 
-A simple file integrity monitoring tool (like aide or tripwire).
+A file integrity monitoring tool (using sha256).
 
 ## install
 
 A global command line tool
 
 ```sh
+
 npm i mzek-poirot -g
 
-poirot --update --files ./files.json
-poirot --check
-poirot --watch
-poirot --readdir --save
-
 ```
 
-where an example `files.json` looks like this...
-
-```json
-[
-  "/etc/aliases",
-  "/etc/hosts.deny",
-  "/etc/hosts.allow",
-  "/etc/inittab",
-  "/etc/issue",
-  "/etc/mtab",
-  "/etc/passwd",
-  "/etc/group",
-  "/etc/fstab",
-  "/etc/hosts",
-  "/etc/modules.conf",
-  "/etc/resolv.conf"
-]
-```
-
-## the file hash database
-
-Poirot creates a folder in your home directory
-
-```
-~/.poirot
-```
-
-The file database is stored there as `files.db.json`
-
-## usage as a library
+Obtain a list of files...
 
 ```sh
-npm i mzek-poirot --save
-```
 
-```js
+find / -type f > ./files.csv
 
-var Poirot = require('mzek-poirot')([ 'helloWorld.txt' ])
-
-Poirot.update(console.log)
-
-fs.appendFileSync('./helloWorld.txt', 'test\n')
-
-Poirot.check(function () {
-  Poirot.watch(function () {
-    Poirot.on('change', function (message) {
-      console.log(message)
-      Poirot.unwatch()
-    })
-  })
-})
-
-```
-
-## run the tests
-
-```sh
-npm run test
 ```
 
 ## usage
 
-Update the file database hashes
+``sh
 
-```sh
-
-poirot --update
-
+poirot --update ./files.csv --output ./db.csv
+time poirot --check ./db.csv
 ```
 
-Check if any of the files have been changed
-
-```sh
-
-poirot --check
-
-```
-
-watch continuously
-
-```sh
-
-poirot --watch
-
-```
-
-generate a files json file...
-
-```sh
-
-poirot --readdir --save
-
-```
-
-Will generate file like: `mzek-1628360392269-files.list.json`
+It can check 170000 files in around 30 seconds on my computer
 
 ## licence
 

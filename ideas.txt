@@ -1,3 +1,0 @@
-
-* namespace file integrity under poirot.files.update()
-* pass in a custom hash function
