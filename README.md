@@ -42,7 +42,7 @@ This file looks like this..
 
 With the absolute file path and sha256 digest in csv format.
 
-# check the db for changes
+## check the db for changes
 
 ```sh
 
@@ -50,7 +50,7 @@ time poirot --check ./db.csv
 
 ```
 
-# generating the db using bash
+## generating the db using bash
 
 You can create the db csv using any method you choose for example...
 using `./examples/gen_file_db.sh`
