@@ -18,6 +18,7 @@ var instructions = `
 
   mzek-poirot
 
+    find / -type f > ./files.csv
     poirot --update ./files.csv --output ./db.csv
     poirot --check ./db.csv
 
