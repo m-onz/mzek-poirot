@@ -1,6 +1,6 @@
 {
   "name": "mzek-poirot",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "description": "file integrity checking tool",
   "main": "index.js",
   "bin": {

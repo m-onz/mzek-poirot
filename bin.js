@@ -4,7 +4,6 @@ var argv = require('minimist')(process.argv.slice(2))
 var toPull = require('stream-to-pull-stream')
 var cliSpinners = require('cli-spinners')
 var spinners = Object.keys(cliSpinners)
-var paramap = require('pull-paramap')
 var pull = require('pull-stream')
 var crypto = require('crypto')
 var path = require('path')
@@ -73,9 +72,6 @@ pull(
     fs.appendFile(report_path, `${i.path}\n`, function () {})
   })
 )
-setTimeout(function () {
-  spinner.stop()
-}, 5000)
 } else if (argv.update) {
 // update
 var count = 0
