@@ -21,7 +21,7 @@ var instructions = `
     poirot --check
 
     poirot --update files.csv --output=custom.named.db.csv
-    poirot --check custom.named.db.csv
+    poirot --check custom.named.db.csv --output report.csv
 
     credits: mzek-poirot. m-onz@mzek 2021.
 
@@ -99,6 +99,7 @@ pull(
     if (i && i.startsWith('/proc')) return cb(null, 'skipping /proc')
     if (i && i.startsWith('/boot')) return cb(null, 'skipping /boot')
     if (i && i.startsWith('/sys')) return cb(null, 'skipping /sys')
+    if (i && i.startsWith('/dev')) return cb(null, 'skipping /dev')
     var hash = crypto.createHash(algo).setEncoding('hex')
     var f = fs.createReadStream(i)
     f.on('error', function () { cb(null, { skipped: true, path: i }) })
