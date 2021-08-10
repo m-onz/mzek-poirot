@@ -1,6 +1,6 @@
 # mzek-poirot
 
-A file integrity monitoring tool (using sha256).
+A file integrity monitoring tool.
 
 ## install
 
