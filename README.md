@@ -1,6 +1,6 @@
 # mzek-poirot
 
-A file integrity monitoring tool.
+A file integrity and entropy monitoring tool.
 
 ## install
 
@@ -18,7 +18,7 @@ Obtain a list of files...
 
 find / -type f > files.csv
 poirot --update files.csv
-poirot --check
+poirot --check --entropy
 
 ```
 

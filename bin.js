@@ -10,112 +10,104 @@ var path = require('path')
 var ora = require('ora')
 var fs = require('fs')
 
+var Poirot = require('.')
+
 var algo = 'BLAKE2s256'
 
 var instructions = `
 
-    poirot - file integrity checking tool
+    poirot
 
-    find / -type f > files.csv
-    poirot --update files.csv
-    poirot --check
+    description:
+      file integriry monitoring
 
-    poirot --update files.csv --output=custom.named.db.csv
-    poirot --check custom.named.db.csv --output report.csv
+       --update
+         create a db file (in csv format) from a csv of file paths
 
-    credits: mzek-poirot. m-onz@mzek 2021.
+       --check
+         check the db file for changes
+
+       --entropy
+         show entropy increases in check report output
+
+       --output
+         change default output names
+
+    help:
+      generate a files list using find
+      find / -type f > files.csv
+
+    credits:
+      mzek 2021.
 
 `
 
 if (Object.keys(argv).length < 2) return console.log(instructions)
+
 // check
+//
 if (argv.check) {
-if (typeof argv.check !== 'string') argv.check = `${process.cwd()}/db.csv`
-var files = path.normalize(argv.check)
-console.log('checking ', files)
-var count = 0
-var _random_spinner = spinners[parseInt(Math.random()*spinners.length)]
-var spinner = ora({ spinner: _random_spinner }).start()
-var report_path = path.normalize(`${process.cwd()}/poirot-report-${new Date().toISOString()}.log`)
-if (argv.output) report_path = argv.output
-console.log('saving log to ', report_path)
-var f = fs.createReadStream(files)
-f.on('close', function () {
-  process.nextTick(function () {
-    spinner.stop()
-  })
-})
-pull(
-  toPull.source(f),
-  pull.map(function (i, cb) {
-    return i.toString().split('\n')
-  }),
-  pull.flatten(),
-  pull.asyncMap(function (i, cb) {
-    var segment = i.split(',')
-    var file    = segment[0]
-    var digest  = segment[1]
-    if (!digest || !file || digest.length !== 64) return cb(null, { skipped: true, path: file })
-    var hash = crypto.createHash(algo).setEncoding('hex')
-    var f = fs.createReadStream(file)
-    f.on('error', function () { cb(null, { skipped: true }) })
-    f.pipe(hash).once('finish', function () {
-      var latest = hash.read()
-      cb(null, { path: file, digest: latest, matches: digest === latest })
+  if (typeof argv.check !== 'string') argv.check = `${process.cwd()}/db.csv`
+  var files = path.normalize(argv.check)
+  var poirot = Poirot({ output: files })
+  console.log('checking ', files)
+  var count = 0
+  var _random_spinner = spinners[parseInt(Math.random()*spinners.length)]
+  var spinner = ora({ spinner: _random_spinner }).start()
+  var report_path = path.normalize(`${process.cwd()}/poirot-report-${new Date().toISOString()}.log`)
+  if (argv.output) report_path = argv.output
+  console.log('saving log to ', report_path)
+  var f = fs.createReadStream(files)
+  f.on('close', function () {
+    process.nextTick(function () {
+      spinner.stop()
     })
-  }),
-  pull.filter(function (i) {
-    return !i.matches && !i.skipped
-  }),
-  pull.drain(function (i) {
-    spinner.text = 'Found '+count++;
-    fs.appendFile(report_path, `${i.path}\n`, function () {})
   })
-)
+  pull(
+    poirot.check(f),
+    pull.filter(function (i) {
+      return !i.matches && !i.skipped
+    }),
+    pull.drain(function (i) {
+      spinner.text = 'Found '+count++;
+      var data = ''
+      console.log(i)
+      if (argv.entropy) data = `${i.path},${i.entropy.increased}\n`
+        else data = `${i.path}\n`
+      fs.appendFile(report_path, data, function () {})
+    })
+  )
+
 } else if (argv.update) {
-// update
-var count = 0
-var files = path.normalize(argv.update)
-var output = path.normalize(process.cwd()+'/db.csv')
-if (argv.output) output = path.normalize(argv.output)
-console.log('checking ', files)
-console.log('saving file db to ', output)
-var _random_spinner = spinners[parseInt(Math.random()*spinners.length)]
-var spinner = ora({ spinner: _random_spinner }).start()
-var f = fs.createReadStream(files)
-f.on('close', function () {
-  process.nextTick(function () {
-    spinner.stop()
+  // update
+  //
+  var count = 0
+  var files = path.normalize(argv.update)
+  var output = path.normalize(process.cwd()+'/db.csv')
+  if (argv.output) output = path.normalize(argv.output)
+  var poirot = Poirot({ output })
+  console.log('checking ', files)
+  console.log('saving file db to ', output)
+  var _random_spinner = spinners[parseInt(Math.random()*spinners.length)]
+  var spinner = ora({ spinner: _random_spinner }).start()
+  var f = fs.createReadStream(files)
+  f.on('close', function () {
+    process.nextTick(function () {
+      spinner.stop()
+    })
   })
-})
-pull(
-  toPull.source(f),
-  pull.map(function (i, cb) {
-    return i.toString().split('\n')
-  }),
-  pull.flatten(),
-  pull.asyncMap(function (i, cb) {
-    if (typeof i !== 'string') return cb(null, 'must be a string')
-    if (i && i.startsWith('/proc')) return cb(null, 'skipping /proc')
-    if (i && i.startsWith('/boot')) return cb(null, 'skipping /boot')
-    if (i && i.startsWith('/sys')) return cb(null, 'skipping /sys')
-    if (i && i.startsWith('/dev')) return cb(null, 'skipping /dev')
-    var hash = crypto.createHash(algo).setEncoding('hex')
-    var f = fs.createReadStream(i)
-    f.on('error', function () { cb(null, { skipped: true, path: i }) })
-    f.pipe(hash).once('finish', function () {
-      var digest = hash.read()
-      var line = `${i},${digest}\n`
-      fs.appendFile(output, line, function (err) {
-        if (err) return cb(null. err)
-        cb(null, line)
+  pull(
+    poirot.update(f),
+    pull.drain(function (obj) {
+      if (!obj.hasOwnProperty('entropy')) return;
+      var line = `${obj.path},${obj.digest},${obj.entropy.average},${obj.entropy.max}\n`
+      fs.appendFile(poirot.options.output, line, (err) => {
+        if (!err) spinner.text = (count++)+' files added'
+          else spinner.text = `Error found in ${obj.path}`
       })
     })
-  }),
-  pull.drain(function () {
-    spinner.text = (count++)+' files added'
-  })
-)}
+  )
+}
 
 // ...
 
