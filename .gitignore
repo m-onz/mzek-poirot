@@ -1,5 +1,6 @@
 package-lock.json
-
+db.csv
+files.csv
 # Logs
 logs
 *.log

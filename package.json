@@ -1,7 +1,7 @@
 {
   "name": "mzek-poirot",
-  "version": "0.0.16",
-  "description": "file integrity and entropy checking tool",
+  "version": "0.0.17",
+  "description": "file integrity and entropy monitoring tool",
   "main": "index.js",
   "bin": {
     "poirot": "bin.js"

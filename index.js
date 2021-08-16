@@ -9,7 +9,7 @@ var fs = require('fs')
 function Poirot (options) {
   if (! (this instanceof Poirot)) return new Poirot (options)
   this.defaults = {
-    excluded: [ '/proc', '/boot', '/sys', '/dev' ],
+    excluded: [],
     output: path.normalize(process.cwd()+'/db.csv'),
     algo: 'BLAKE2s256'
   }
