@@ -3,6 +3,9 @@
   "version": "0.0.17",
   "description": "file integrity and entropy monitoring tool",
   "main": "index.js",
+  "scripts": {
+    "test": "node test/test.js"
+  },
   "bin": {
     "poirot": "bin.js"
   },

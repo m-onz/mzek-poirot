@@ -27,7 +27,7 @@ function checkExcludes (path, excluded) {
 Poirot.prototype.update = function (readStream) {
   var self = this
   return self.scanFromCSV(readStream, function (i, cb) {
-    if (typeof i !== 'string') return cb(null, 'must be a string')
+    if (typeof i !== 'string' || !i.length) return cb(null, {message:'skipped'})
     if (i && checkExcludes(i, self.options.excluded)) return cb(null, {message:'skipping excluded path'})
     var hash = crypto.createHash(self.options.algo).setEncoding('hex')
     var f = fs.createReadStream(i)
@@ -105,6 +105,7 @@ Poirot.prototype.scanFromCSV = function (readStream, cb) {
       return i.toString().split('\n')
     }),
     pull.flatten(),
+    pull.filter(function (i) { return i.length; }),
     pull.asyncMap(cb)
   )
 }
